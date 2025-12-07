@@ -7,14 +7,31 @@ const ChatBox = () => {
   const { selectedChat, theme } = useAppContext();
   const [messages, setMessages] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [prompt, setPrompt] = React.useState('');
+  const [mode, setMode] = React.useState('text');
+  const [ispublised, setIspublished] = React.useState(false);
+  const containerRef = React.useRef(null);
+  const onsubmit = async (e) => {
+    e.preventDefault();
+  }
   useEffect(() => {
     if (selectedChat) {
       setMessages(selectedChat.messages);
     }
   }, [selectedChat])
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({
+        top: containerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+
+  }, [messages])
   return (
-    <div className='flex-1 flex flex-col  justify-between m-5 md:m-10 xl:mx-30 max-md:mt-14 2xl:pr-40'>
-      <div className='flex-1 mb-5 overflow-y-scroll'>
+    <div className='flex-1 flex flex-col  justify-between m-3 md:m-10 xl:mx-30 max-md:mt-14 2xl:pr-40'>
+
+      <div ref={containerRef} className='flex-1 mb-5 overflow-y-scroll'>
         {
           messages.length === 0 && (
             <div className='h-full flex flex-col items-center justify-center gap-2 text-primary'>
@@ -24,14 +41,32 @@ const ChatBox = () => {
           )
         }
         {
-          messages.map((message,index) => 
+          messages.map((message, index) =>
             <Meassage key={index} {...message} />
           )
         }
-        
+        {
+          loading && <div className='loader flex items-center gap-1.5'>
+            <div className='w-1.5 h-1.5 rounded-full bg-gray-500 dark:bg-white animate-bounce'></div>
+            <div className='w-1.5 h-1.5 rounded-full bg-gray-500 dark:bg-white animate-bounce'></div>
+            <div className='w-1.5 h-1.5 rounded-full bg-gray-500 dark:bg-white animate-bounce'></div>
+          </div>
+        }
       </div>
-      <form>
-
+      {mode === 'image' && (
+        <label className='inline-flex items-center gap-2 mb-3 text-sm mx-auto'>
+          <p className='text-xs '>Publish Generated Image to Community</p>
+          <input type="checkbox" checked={ispublised} onChange={() => setIspublished(!ispublised)} className='w-4 h-4 rounded-md accent-primary cursor-pointer' />
+        </label>
+      )}
+      <form className='bg-primary/20 dark:bg-[#583C79]/30 border border-primary 
+      dark:border-[#80609F]/30 rounded-full w-full max-w-2xl p-3 pl-4 mx-auto flex gap-4 items-center' onSubmit={onsubmit}>
+        <select onChange={(e) => setMode(e.target.value)} value={mode} className='text-sm pl-3 pr-2 outline-none'>
+          <option className='dark:bg-purple-900' value='text'>Text</option>
+          <option className='dark:bg-purple-900' value='image'>Image</option>
+        </select>
+        <input onChange={(e) => setPrompt(e.target.value)} value={prompt} type="text" className='flex-1 w-full text-sm outline-none' placeholder='Ask Anything' required />
+        <button disabled={loading} className=''><img src={loading ? assets.stop_icon : assets.send_icon} alt="send" className='w-8 cursor-pointer' /></button>
       </form>
     </div>
   )
