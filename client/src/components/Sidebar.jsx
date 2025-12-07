@@ -1,14 +1,13 @@
 import React from 'react'
 import { useAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets';
-import moment from 'moment';
-const Sidebar = () => {
+const Sidebar = ({ ismenuopen, setIsmenuopen }) => {
     const { chats, setSelectedChat, theme, setTheme, navigate, user } = useAppContext();
     const [search, setSearch] = React.useState("");
     return (
-        <div className='flex flex-col h-screen min-w-72 p-2 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 
+        <div className={`flex flex-col h-screen min-w-72 p-2 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 
         border-r border-[#80609F]/30 backdrop-blur-3xl
-        transition-all duration-500 max-md:absolute left-0 z-1'>
+        transition-all duration-500 max-md:absolute left-0 z-10 ${!ismenuopen && 'max-md:-translate-x-full'}`}>
             {/* Logo */}
             <img src={theme === "dark" ? assets.logo_full : assets.logo_full_dark} alt="Logo" className="w-full max-w-48" />
             {/* New Chat Button */}
@@ -25,7 +24,7 @@ const Sidebar = () => {
                 <input
                     type="text"
                     placeholder='Search chats...'
-                    className='bg-transparent outline-none'
+                    className='bg-transparent outline-none dark:text-white not-dark:text-black'
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
@@ -38,7 +37,7 @@ const Sidebar = () => {
                             includes(search.toLowerCase())).map((chat) => (
                                 <button
                                     key={chat._id}
-                                    onClick={() => setSelectedChat(chat)}
+                                    onClick={() => {navigate('/'); setSelectedChat(chat);setIsmenuopen(false)} }
                                     className='w-full px-3 py-2 rounded-md text-left hover:bg-gray-200 dark:hover:bg-gray-700/40
                                     transition-colors group flex items-center justify-between text-gray-800 dark:text-white text-sm'>
                                     <span className='truncate'>
@@ -51,14 +50,14 @@ const Sidebar = () => {
                 }
             </div>
             <div>
-                <button onClick={() => navigate('/community')} className='flex items-center p-1 gap-2  mt-4 w-full rounded-md cursor-pointer 
+                <button onClick={() => {navigate('/community');setIsmenuopen(false)}} className='flex items-center p-1 gap-2  mt-4 w-full rounded-md cursor-pointer 
                  hover:bg-gray-200 dark:hover:bg-gray-700/40 transition-colors'>
                     <img src={assets.gallery_icon} className='w-4 not-dark:invert' alt="" />
                     <div className='flex flex-col text-sm text-left'>
                         <p className='text-gray-800 dark:text-white'>Community Images</p>
                     </div>
                 </button>
-                <button onClick={() => navigate('/credits')} className='flex items-center p-1 gap-2  mt-2 w-full rounded-md cursor-pointer 
+                <button onClick={() => {navigate('/credits');setIsmenuopen(false)}} className='flex items-center p-1 gap-2  mt-2 w-full rounded-md cursor-pointer 
             hover:bg-gray-200 dark:hover:bg-gray-700/40 transition-colors'>
                     <img src={assets.diamond_icon} className='w-4 dark:invert' alt="" />
                     <div className='flex flex-col text-sm text-left'>
@@ -81,11 +80,13 @@ const Sidebar = () => {
                         <span className='absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4'></span>
                     </label>
                 </button>
-                <div  className='flex items-center justify-between gap-2 p-1 mt-2 w-full rounded-md hover:bg-gray-200 dark:hover:bg-gray-700/40 transition-colors group'>
+                <div className='flex items-center justify-between gap-2 p-1 mt-2 w-full rounded-md hover:bg-gray-200 dark:hover:bg-gray-700/40 transition-colors group'>
                     <img src={assets.user_icon} className='w-7 rounded-full' alt="" />
-                    <p className='flex-1 text-sm dark:text-primary truncate'>{user?user.name:'Login to your account'}</p>
+                    <p className='flex-1 text-sm dark:text-primary truncate'>{user ? user.name : 'Login to your account'}</p>
+                    {user && <img src={assets.logout_icon} className='h-5 cursor-pointer  not-dark:invert group-hover:block' />}
                 </div>
             </div>
+            <img onClick={() => setIsmenuopen(false)} src={assets.close_icon} className='absolute top-3 right-3 w-5 h-5 cursor-pointer md:hidden not-dark:invert' />
         </div>
     )
 }

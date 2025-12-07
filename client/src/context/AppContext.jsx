@@ -27,7 +27,7 @@ export const AppContextProvider = ({ children }) => {
         else {
             setChats([]);
             setSelectedChat(null);
-            navigate("/login");
+            // navigate("/login");
         }
     }, [user]);
     React.useEffect(() => {
