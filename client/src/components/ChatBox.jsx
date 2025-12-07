@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets';
 import Meassage from './Meassage';
 
 const ChatBox = () => {
   const { selectedChat, theme } = useAppContext();
-  const [messages, setMessages] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
-  const [prompt, setPrompt] = React.useState('');
-  const [mode, setMode] = React.useState('text');
-  const [ispublised, setIspublished] = React.useState(false);
-  const containerRef = React.useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [mode, setMode] = useState('text');
+  const [ispublised, setIspublished] = useState(false);
+  const containerRef = useRef(null);
   const onsubmit = async (e) => {
     e.preventDefault();
   }

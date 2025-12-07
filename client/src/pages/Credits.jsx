@@ -1,16 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { dummyPlans } from '../assets/assets';
 import Loading from './Loading';
 
 const Credits = () => {
-  const [plan, setPlan] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [plan, setPlan] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fetchPlans = async () => {
     //fetch plans from backend
     setPlan(dummyPlans);
     setLoading(false);
   }
-  React.useEffect(() => {
+  useEffect(() => {
     fetchPlans();
   }, []);
   if (loading) return <Loading />;

@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets';
 const Sidebar = ({ ismenuopen, setIsmenuopen }) => {
     const { chats, setSelectedChat, theme, setTheme, navigate, user } = useAppContext();
-    const [search, setSearch] = React.useState("");
+    const [search, setSearch] = useState("");
     return (
         <div className={`flex flex-col h-screen min-w-72 p-2 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 
         border-r border-[#80609F]/30 backdrop-blur-3xl

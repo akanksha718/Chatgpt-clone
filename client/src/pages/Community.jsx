@@ -1,16 +1,16 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { dummyPublishedImages } from '../assets/assets';
 import Loading from './Loading';
 
 const Community = () => {
-  const [images, setImages] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const fetchImages = async () => {
     //fetch images from backend
     setImages(dummyPublishedImages);
     setLoading(false);
   };
-  React.useEffect(() => {
+  useEffect(() => {
     fetchImages();
   }, []);
   if (loading) return <Loading />;
