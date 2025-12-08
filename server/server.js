@@ -10,7 +10,9 @@ import stripeWebhook from './controllers/webhooks.js';
 
 const app = express();
 
-await connectDB();
+// Connect to database (don't use top-level await for Vercel)
+connectDB().catch(err => console.error('Database connection failed:', err));
+
 app.post('/api/stripe', express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(cors());
@@ -26,6 +28,12 @@ app.use('/api/credit', creditRouter);
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Only listen if not in serverless environment
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+// Export for Vercel serverless
+export default app;
