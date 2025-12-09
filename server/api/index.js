@@ -23,15 +23,23 @@ const initDB = async () => {
   }
 };
 
+// CORS must be first
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  credentials: true
+}));
+
 // Middleware to ensure DB is connected
 app.use(async (req, res, next) => {
   await initDB();
   next();
 });
 
+// Stripe webhook needs raw body
 app.post('/api/stripe', express.raw({ type: 'application/json' }), stripeWebhook);
 
-app.use(cors());
+// JSON parser for all other routes
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -47,4 +55,5 @@ app.use('/api/chat', chatRouter);
 app.use('/api/message', messageRouter);
 app.use('/api/credit', creditRouter);
 
+// Export the Express app for Vercel serverless
 export default app;
