@@ -55,5 +55,14 @@ app.use('/api/chat', chatRouter);
 app.use('/api/message', messageRouter);
 app.use('/api/credit', creditRouter);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || 'Internal server error'
+  });
+});
+
 // Export the Express app for Vercel serverless
 export default app;

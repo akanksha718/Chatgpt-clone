@@ -1,4 +1,4 @@
-# 🤖 ChatGPT Clone
+# 🤖 Qucik-GPT
 
 A full-stack AI chat application built with **React 19**, **Node.js/Express**, and **MongoDB**. This project replicates the core functionality of ChatGPT with intelligent text responses, AI image generation, user authentication, credit-based billing, and community sharing features.
 
