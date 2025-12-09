@@ -1,9 +1,34 @@
 import React, { useState } from 'react'
 import { useAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets';
+import toast from 'react-hot-toast';
 const Sidebar = ({ ismenuopen, setIsmenuopen }) => {
-    const { chats, setSelectedChat, theme, setTheme, navigate, user } = useAppContext();
+    const { chats, setSelectedChat, theme, setTheme, navigate, user, createNewChat,axios,setChats,fetchUserchat,setToken,token } = useAppContext();
     const [search, setSearch] = useState("");
+    const logout =()=>{
+        localStorage.removeItem("token");
+        setToken(null);
+        setChats([]);
+        setSelectedChat(null);
+        toast.success("Logged out successfully");
+    }
+    const deleteChat=async(e,chatId)=>{
+        try{
+            e.stopPropagation();
+            const confirmDelete=window.confirm("Are you sure you want to delete this chat?");
+            if(!confirmDelete)return;
+            const {data}=await axios.post(`/api/chat/delete`,{chatId}, { headers: { Authorization: token } });    
+            if(data.success){
+                setChats((prevChats)=>prevChats.filter((chat)=>chat._id!==chatId));
+            }else{
+                toast.error(data.message);
+            }
+        }catch(error){
+            toast.error("Server error");
+        }
+
+    }
+
     return (
         <div className={`flex flex-col h-screen min-w-72 p-2 dark:bg-gradient-to-b from-[#242124]/30 to-[#000000]/30 
         border-r border-[#80609F]/30 backdrop-blur-3xl
@@ -11,10 +36,10 @@ const Sidebar = ({ ismenuopen, setIsmenuopen }) => {
             {/* Logo */}
             <img src={theme === "dark" ? assets.logo_full : assets.logo_full_dark} alt="Logo" className="w-full max-w-48" />
             {/* New Chat Button */}
-            <button
+            <button 
                 className="flex  items-center w-full py-2 mt-2 text-white
                 bg-gradient-to-r from-[#7B61FF] to-[#FF61C6] rounded-lg hover:opacity-90 cursor-pointer"
-                onClick={() => setSelectedChat(null)}
+                onClick={() => { createNewChat(); setIsmenuopen(false); }}
             >
                 <span className='ml-2 mr-2 text-xl'>+</span> New Chat
             </button>
@@ -43,7 +68,7 @@ const Sidebar = ({ ismenuopen, setIsmenuopen }) => {
                                     <span className='truncate'>
                                         {chat.messages.length > 0 ? chat.messages[0].content.slice(0, 30) + (chat.messages[0].content.length > 30 ? '...' : '') : chat.name}
                                     </span>
-                                    <img src={assets.bin_icon} className='hidden group-hover:block w-3.5 cursor-pointer
+                                    <img onClick={(e)=>toast.promise(deleteChat(e,chat._id),{loading:"Deleting chat..."})} src={assets.bin_icon} className='hidden group-hover:block w-3.5 cursor-pointer
                                     not-dark:invert flex-shrink-0 ml-2'/>
                                 </button>
                             ))
@@ -81,9 +106,9 @@ const Sidebar = ({ ismenuopen, setIsmenuopen }) => {
                     </label>
                 </button>
                 <div className='flex items-center justify-between gap-2 p-1 mt-2 w-full rounded-md hover:bg-gray-200 dark:hover:bg-gray-700/40 transition-colors group'>
-                    <img src={assets.user_icon} className='w-7 rounded-full' alt="" />
+                    <img  src={assets.user_icon} className='w-7 rounded-full' alt="" />
                     <p className='flex-1 text-sm dark:text-primary truncate'>{user ? user.name : 'Login to your account'}</p>
-                    {user && <img src={assets.logout_icon} className='h-5 cursor-pointer  not-dark:invert group-hover:block' />}
+                    {user && <img onClick={logout} src={assets.logout_icon} className='h-5 cursor-pointer  not-dark:invert group-hover:block' />}
                 </div>
             </div>
             <img onClick={() => setIsmenuopen(false)} src={assets.close_icon} className='absolute top-3 right-3 w-5 h-5 cursor-pointer md:hidden not-dark:invert' />

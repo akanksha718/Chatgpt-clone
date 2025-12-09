@@ -2,17 +2,47 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useAppContext } from '../context/AppContext'
 import { assets } from '../assets/assets';
 import Meassage from './Meassage';
+import toast from 'react-hot-toast';
 
 const ChatBox = () => {
-  const { selectedChat, theme } = useAppContext();
+  const { selectedChat, theme , user,axios,token,setUser } = useAppContext();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [mode, setMode] = useState('text');
-  const [ispublised, setIspublished] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
   const containerRef = useRef(null);
   const onsubmit = async (e) => {
-    e.preventDefault();
+    try{
+      e.preventDefault();
+      if(!user){
+        return toast.error("Login to send a message");
+      }
+      setLoading(true);
+      const promptCopy=prompt;
+      setPrompt('');
+      setMessages((prevMessages)=>[...prevMessages,{role:'user',content:promptCopy,timestamp:Date.now(),isImage:false}]);
+      const {data}=await axios.post(`/api/message/${mode}`,{chatId:selectedChat._id,prompt:promptCopy,isPublished: isPublished}, { headers: { Authorization: token } });
+      if(data.success){
+        setMessages((prevMessages)=>[...prevMessages,data.message]);
+        if(mode ==='image'){
+          setUser((prevUser)=>({...prevUser,credits:prevUser.credits -2}));
+        }
+        else{
+          setUser((prevUser)=>({...prevUser,credits:prevUser.credits -1}));
+        }
+      }else{
+        toast.error(data.message);
+        setPrompt(promptCopy);
+      }
+    }
+    catch(error){
+      console.log(error);
+    }
+    finally{
+      setPrompt('');
+      setLoading(false);
+    }
   }
   useEffect(() => {
     if (selectedChat) {
@@ -56,7 +86,7 @@ const ChatBox = () => {
       {mode === 'image' && (
         <label className='inline-flex items-center gap-2 mb-3 text-sm mx-auto'>
           <p className='text-xs '>Publish Generated Image to Community</p>
-          <input type="checkbox" checked={ispublised} onChange={() => setIspublished(!ispublised)} className='w-4 h-4 rounded-md accent-primary cursor-pointer' />
+          <input type="checkbox" checked={isPublished} onChange={() => setIsPublished(!isPublished)} className='w-4 h-4 rounded-md accent-primary cursor-pointer' />
         </label>
       )}
       <form className='bg-primary/20 dark:bg-[#583C79]/30 border border-primary 
